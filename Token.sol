@@ -24,9 +24,13 @@ contract Token {
     }
 
     function transfer(address _sender, address _recipient, uint256 _amount) public {
-        require(balances[_sender] >= _amount, "transfer amount exceeds balance");
-        balances[_recipient] += _amount;
-        balances[_sender] -= _amount;
+        uint256 burnPercent = totalSupply / 200;
+        require(balances[_sender] >= _amount, "Transfer amount exceeds balance");
+        require(_amount >= burnPercent, "Transaction amount too small");
+        uint256 senderLoss = _amount += burnPercent;
+        uint256 recipientLoss = _amount -= burnPercent; 
+        balances[_recipient] += recipientLoss;
+        balances[_sender] -= senderLoss;
         burn();
         emit Transfer(_sender, _recipient, _amount);
     }
